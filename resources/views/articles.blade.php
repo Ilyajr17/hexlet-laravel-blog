@@ -3,6 +3,7 @@
 
 @section('title', 'Статьи')
 
+@section('header', 'Статьи')
 @section('content')
-<h1>Статьи</h1>
+    <p>Тут будут статьи</p>
 @endsection
