@@ -6,5 +6,6 @@
 @section('content')
 <a href="/about">О блоге</a>
 <a href="/articles">Статьи</a>
+
 @endsection
 
