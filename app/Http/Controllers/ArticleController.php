@@ -10,8 +10,21 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ArticleController extends Controller
 {
+    public static function createNewSheet($spreadsheet, $sheetIndex)
+    {
+        $spreadsheet->createSheet($sheetIndex);
+        $sheet = $spreadsheet->getSheet($sheetIndex);
+        // заголовки
+        $sheet->setCellValue('A1', 'ID');    // Заголовок для ID
+        $sheet->setCellValue('B1', 'Title'); // Заголовок для Title
+        return $sheet;
+
+    }
     public function index(Request $request)
     {
+        ini_set('max_execution_time', 300);
+        ini_set('memory_limit', '-1');
+
         $data = [
             [
                 'id' => 1,
@@ -24,18 +37,43 @@ class ArticleController extends Controller
         ];
 
         $spreadsheet = new Spreadsheet();
-//Получаем текущий активный лист
-$sheet = $spreadsheet->getActiveSheet();
 
-$sheet->setCellValue('A1', 'ID');
-$sheet->setCellValue('B1', 'Title');
+        $maxRowsPerSheet = 500000; // Максимальное количество строк на листе
+$currentRow = 2; // Номер текущей строки
+$sheetIndex = 0; // Индекс текущего листа
+
+//Получаем текущий активный лист
+// $sheet = $spreadsheet->getActiveSheet();
+
+$currentSheet = ArticleController::createNewSheet($spreadsheet, $sheetIndex);
+
+// Генерация данных
+$numberOfRows = 1120000; // Общее количество строк данных
+for ($i = 1; $i <= $numberOfRows; $i++) {
+    // Если текущая строка превышает лимит, создайте новый лист
+    if ($currentRow > $maxRowsPerSheet) {
+        $sheetIndex++;
+        $currentSheet = ArticleController::createNewSheet($spreadsheet, $sheetIndex);
+        $currentRow = 2; // Начать со второй строки на новом листе (первая - заголовки)
+    }
+
+    // Заполняем данные
+    $id = $i; // ID будет равен номеру строки
+    // echo "<pre>";
+    // var_dump($sheetIndex);
+    // echo "</pre>";
+    $title = 'Title ' . rand(1, 10000); // Случайное название
+    $currentSheet->setCellValue("A{$currentRow}", $id);
+    $currentSheet->setCellValue("B{$currentRow}", $title);
+    $currentRow++;
+}
 
 $writer = new Xlsx($spreadsheet);
 
 $writer->save('hello.xlsx');
-
-        echo 'hi';
-        die;
+echo "Данные успешно записаны в large_data.xlsx.";
+        // echo 'hi';
+        // die;
         $name = $request->input('name');
 
         $articles = $name ? Article::where('name', 'LIKE', "%{$name}%")->paginate(5) : Article::paginate(5);
