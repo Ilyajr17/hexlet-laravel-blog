@@ -26,17 +26,12 @@ class ArticleController extends Controller
         $spreadsheet = new Spreadsheet();
 //Получаем текущий активный лист
 $sheet = $spreadsheet->getActiveSheet();
-// Записываем в ячейку A1 данные
-// $sheet->setCellValue('A1', 'Hello my Friend!');
-
 
 $sheet->setCellValue('A1', 'ID');
 $sheet->setCellValue('B1', 'Title');
 
 $writer = new Xlsx($spreadsheet);
-//Сохраняем файл в текущей папке, в которой выполняется скрипт.
-//Чтобы указать другую папку для сохранения.
-//Прописываем полный путь до папки и указываем имя файла
+
 $writer->save('hello.xlsx');
 
         echo 'hi';
