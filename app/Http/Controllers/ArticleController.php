@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -22,23 +23,36 @@ class ArticleController extends Controller
     }
     public function index(Request $request)
     {
+
+        $mockStatements = Collection::times(100000, function ($number) {
+            return new Article([
+                'name' => 'test' . $number,
+                'body' => 'sample text ' . $number,
+                // Добавьте другие поля по необходимости
+            ]);
+        });
+// dd($mockStatements);
+
+
+        // die;
+
         ini_set('max_execution_time', 300);
         ini_set('memory_limit', '-1');
 
-        $data = [
-            [
-                'id' => 1,
-                'title' => 'vanz',
-            ],
-            [
-                'id' => 2,
-                'title' => 'ole',
-            ],
-        ];
+        // $data = [
+        //     [
+        //         'id' => 1,
+        //         'title' => 'vanz',
+        //     ],
+        //     [
+        //         'id' => 2,
+        //         'title' => 'ole',
+        //     ],
+        // ];
 
         $spreadsheet = new Spreadsheet();
 
-        $maxRowsPerSheet = 500000; // Максимальное количество строк на листе
+        $maxRowsPerSheet = 5000; // Максимальное количество строк на листе
 $currentRow = 2; // Номер текущей строки
 $sheetIndex = 0; // Индекс текущего листа
 
@@ -48,25 +62,37 @@ $sheetIndex = 0; // Индекс текущего листа
 $currentSheet = ArticleController::createNewSheet($spreadsheet, $sheetIndex);
 
 // Генерация данных
-$numberOfRows = 1120000; // Общее количество строк данных
-for ($i = 1; $i <= $numberOfRows; $i++) {
-    // Если текущая строка превышает лимит, создайте новый лист
+// $numberOfRows = 1120000; // Общее количество строк данных
+foreach($mockStatements as $item) {
     if ($currentRow > $maxRowsPerSheet) {
         $sheetIndex++;
         $currentSheet = ArticleController::createNewSheet($spreadsheet, $sheetIndex);
         $currentRow = 2; // Начать со второй строки на новом листе (первая - заголовки)
     }
 
-    // Заполняем данные
-    $id = $i; // ID будет равен номеру строки
-    // echo "<pre>";
-    // var_dump($sheetIndex);
-    // echo "</pre>";
-    $title = 'Title ' . rand(1, 10000); // Случайное название
-    $currentSheet->setCellValue("A{$currentRow}", $id);
-    $currentSheet->setCellValue("B{$currentRow}", $title);
+    $currentSheet->setCellValue("A{$currentRow}", $item->name);
+    $currentSheet->setCellValue("B{$currentRow}", $item->body);
     $currentRow++;
 }
+
+// for ($i = 1; $i <= $numberOfRows; $i++) {
+//     // Если текущая строка превышает лимит, создайте новый лист
+//     if ($currentRow > $maxRowsPerSheet) {
+//         $sheetIndex++;
+//         $currentSheet = ArticleController::createNewSheet($spreadsheet, $sheetIndex);
+//         $currentRow = 2; // Начать со второй строки на новом листе (первая - заголовки)
+//     }
+
+//     // Заполняем данные
+//     $id = $i; // ID будет равен номеру строки
+//     // echo "<pre>";
+//     // var_dump($sheetIndex);
+//     // echo "</pre>";
+//     $title = 'Title ' . rand(1, 10000); // Случайное название
+//     $currentSheet->setCellValue("A{$currentRow}", $id);
+//     $currentSheet->setCellValue("B{$currentRow}", $title);
+//     $currentRow++;
+// }
 
 $writer = new Xlsx($spreadsheet);
 
