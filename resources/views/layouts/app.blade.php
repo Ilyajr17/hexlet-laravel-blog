@@ -11,6 +11,8 @@
     </head>
     <body>
         <div class="container mt-4">
+            <a href="{{ route('pages.show', ['page' => 'about']) }}">
+
 <a href="{{ route('articles.index') }}">статьи</a>
 
             <h1>@yield('header')</h1>

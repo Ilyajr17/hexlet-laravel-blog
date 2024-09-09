@@ -5,10 +5,42 @@ namespace App\Http\Controllers;
 use App\Models\Article;
 use Illuminate\Http\Request;
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 class ArticleController extends Controller
 {
     public function index(Request $request)
     {
+        $data = [
+            [
+                'id' => 1,
+                'title' => 'vanz',
+            ],
+            [
+                'id' => 2,
+                'title' => 'ole',
+            ],
+        ];
+
+        $spreadsheet = new Spreadsheet();
+//Получаем текущий активный лист
+$sheet = $spreadsheet->getActiveSheet();
+// Записываем в ячейку A1 данные
+// $sheet->setCellValue('A1', 'Hello my Friend!');
+
+
+$sheet->setCellValue('A1', 'ID');
+$sheet->setCellValue('B1', 'Title');
+
+$writer = new Xlsx($spreadsheet);
+//Сохраняем файл в текущей папке, в которой выполняется скрипт.
+//Чтобы указать другую папку для сохранения.
+//Прописываем полный путь до папки и указываем имя файла
+$writer->save('hello.xlsx');
+
+        echo 'hi';
+        die;
         $name = $request->input('name');
 
         $articles = $name ? Article::where('name', 'LIKE', "%{$name}%")->paginate(5) : Article::paginate(5);
@@ -88,5 +120,12 @@ class ArticleController extends Controller
         }
 
         return redirect()->route('articles.index');
+    }
+
+    public function report()
+    {
+echo "hi";
+var_dump($_POST);
+die;
     }
 }

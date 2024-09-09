@@ -7,11 +7,8 @@ use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
-    public function about()
+    public function show($id)
     {
-        // Точка используется вместо /.
-        // То есть шаблон находится по пути resources/views/page/about.blade.php
-
-        return view('page.about');
+        return view("page.{$id}");
     }
 }
